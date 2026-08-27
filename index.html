@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 AI 數學遊戲提示詞產生器 | 專為平板與 Google Sites 設計</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts (Noto Sans TC & Bubblegum Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+            },
+            pastel: {
+              pink: '#FFDEE9',
+              coral: '#FFE5EC',
+              sky: '#B5FFFC',
+              mint: '#D4FC79',
+              yellow: '#FCEE71',
+              purple: '#E0C3FC',
+              card: '#1E293B',
+              board: '#0F172A'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            fun: ['"Fredoka"', '"Noto Sans TC"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at top right, #1e1b4b, #0f172a 40%, #090d16 100%);
+      min-height: 100vh;
+      color: #f1f5f9;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    
+    .glass-card {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    
+    .glass-highlight {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(251, 113, 133, 0.3);
+    }
+
+    /* 自訂金色/亮黃色選單與按鈕 */
+    .select-pill {
+      background: #FBBF24;
+      color: #1F2937;
+      font-weight: 700;
+      border-radius: 9999px;
+      padding: 0.35rem 1.25rem;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.35);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 2px solid #F59E0B;
+      cursor: pointer;
+    }
+    .select-pill:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 18px rgba(251, 191, 36, 0.5);
+    }
+    .select-pill select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: none;
+      font-weight: 700;
+      color: #1F2937;
+      outline: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    /* 隱藏滾動條但保持滾動 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* 動畫效果 */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(244, 63, 94, 0.8); }
+    }
+    .pulse-glow { animation: pulseGlow 3s infinite ease-in-out; }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start min-h-screen">
+
+  <!-- 頂部標題區 -->
+  <header class="w-full max-w-4xl text-center mb-6 sm:mb-8 pt-2">
+    <div class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-300 text-sm font-semibold mb-3 shadow-lg shadow-rose-950/40">
+      <i class="fa-solid fa-wand-magic-sparkles text-rose-400"></i> AI 數學互動教學工具箱
+    </div>
+    <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white flex items-center justify-center gap-3">
+      <span class="text-3xl sm:text-5xl">🎮</span>
+      <span class="bg-gradient-to-r from-amber-300 via-rose-300 to-pink-400 bg-clip-text text-transparent">設計遊戲提示詞</span>
+    </h1>
+    <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+      選擇年級、課題、玩法與專屬角色，一鍵生成提示詞給 Gemini，即時製作可嵌入 Google Sites 的趣味數學遊戲！
+    </p>
+  </header>
+
+  <!-- 主要操作容器 -->
+  <main class="w-full max-w-4xl space-y-6">
+
+    <!-- 第一步：選擇並自訂遊戲參數 (卡片主體) -->
+    <section class="glass-card rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden border border-slate-700/60">
+      <!-- 頂部標籤 -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-700/70 mb-5">
+        <div class="flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-bold flex items-center justify-center text-sm shadow-md">1</span>
+          <h2 class="text-lg sm:text-xl font-bold text-white tracking-wide">第一步 - 選擇並組裝提示詞</h2>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-rose-300 border border-rose-500/30 font-medium">
+          <i class="fa-solid fa-tablet-screen-button mr-1"></i> 支援平板觸控
+        </span>
+      </div>
+
+      <!-- 快速年級切換按鈕 (小四/小五/小六) -->
+      <div class="mb-5">
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          <i class="fa-solid fa-graduation-cap text-amber-400 mr-1.5"></i> 請先選擇教學年級：
+        </label>
+        <div class="grid grid-cols-3 gap-2.5 sm:gap-4 p-1.5 bg-slate-900/80 rounded-2xl border border-slate-700">
+          <button type="button" onclick="setGrade('p4')" id="btn-grade-p4" class="grade-tab-btn py-2.5 sm:py-3 px-3 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-900/50">
+            <span>🎒 小學四年級</span>
+          </button>
+          <button type="button" onclick="setGrade('p5')" id="btn-grade-p5" class="grade-tab-btn py-2.5 sm:py-3 px-3 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700">
+            <span>📚 小學五年級</span>
+          </button>
+          <button type="button" onclick="setGrade('p6')" id="btn-grade-p6" class="grade-tab-btn py-2.5 sm:py-3 px-3 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700">
+            <span>🎓 小學六年級</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 互動造句選擇板 (與參考圖高度契合之黃色膠囊式互動區) -->
+      <div class="bg-slate-900/90 rounded-2xl p-4 sm:p-6 border border-slate-700/80 mb-6 space-y-4">
+        <p class="text-xs text-rose-300 font-bold mb-1 flex items-center gap-1.5">
+          <i class="fa-solid fa-pen-ruler"></i> 點選黃色選單即可自由修改遊戲設定：
+        </p>
+
+        <!-- 句子構建器 -->
+        <div class="leading-loose text-base sm:text-lg text-slate-100 flex flex-wrap items-center gap-y-3 gap-x-2">
+          <span>在</span>
+          
+          <!-- 裝置選單 -->
+          <div class="select-pill">
+            <select id="select-device" onchange="updatePrompt()">
+              <option value="平板電腦 (iPad/觸控平板)">平板電腦 📱</option>
+              <option value="桌上電腦與筆記型電腦">電腦/筆電 💻</option>
+              <option value="電子白板 (大屏幕觸控)">電子白板 🖥️</option>
+              <option value="智能手機">手機 📱</option>
+            </select>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-800"></i>
+          </div>
+
+          <span>，編寫程式碼製作</span>
+
+          <!-- 遊戲模式選單 -->
+          <div class="select-pill">
+            <select id="select-game-type" onchange="updatePrompt()">
+              <option value="接球消除 (Catching)">接球 🧺</option>
+              <option value="氣球爆破 (Balloon Pop)">爆破 🎈</option>
+              <option value="分類收納 (Sorting)">分類 📦</option>
+              <option value="跑酷吃金幣 (Runner)">跑酷 🏃</option>
+              <option value="泡泡射擊 (Bubble Shooter)">射擊 🎯</option>
+              <option value="迷宮吃豆 (Maze Explorer)">迷宮 🧀</option>
+            </select>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-800"></i>
+          </div>
+
+          <!-- 對戰與玩家模式 -->
+          <div class="select-pill !bg-amber-300">
+            <select id="select-player-mode" onchange="updatePrompt()">
+              <option value="單人練習 (自主練習與即時回饋)">單人練習 👤</option>
+              <option value="雙人分屏對戰 (同屏比拼手速與答題)">雙人對戰 ⚔️</option>
+              <option value="雙人合作闖關 (共同解題累積能量)">雙人合作 🤝</option>
+              <option value="60秒限時衝刺挑戰">限時衝刺 ⏱️</option>
+            </select>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-800"></i>
+          </div>
+
+          <span>遊戲幫助學生學習</span>
+
+          <!-- 課題選單 (動態根據年級載入) -->
+          <div class="select-pill">
+            <select id="select-topic" onchange="handleTopicChange()">
+              <!-- JS 動態生成 -->
+            </select>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-800"></i>
+          </div>
+
+          <span>的「</span>
+
+          <!-- 目標細項選單 -->
+          <div class="select-pill !bg-amber-200">
+            <select id="select-goal" onchange="updatePrompt()">
+              <!-- JS 動態生成 -->
+            </select>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-800"></i>
+          </div>
+
+          <span>」。請讓遊戲主角與元素看起來像</span>
+
+          <!-- 角色外觀選單 -->
+          <div class="select-pill">
+            <select id="select-character" onchange="handleCharacterChange()">
+              <option value="魚 🐟">魚 🐟</option>
+              <option value="小貓 🐱">小貓 🐱</option>
+              <option value="蛋糕 🎂">蛋糕 🎂</option>
+              <option value="珍珠奶茶 🧋">珍珠奶茶 🧋</option>
+              <option value="太空宇航員 👨‍🚀">太空人 👨‍🚀</option>
+              <option value="可愛恐龍 🦖">恐龍 🦖</option>
+              <option value="魔法師與魔藥 🧙‍♂️">魔法師 🧙</option>
+              <option value="夢幻獨角獸 🦄">獨角獸 🦄</option>
+              <option value="自訂上載頭像 📸">自拍照片/學生頭像 📸</option>
+            </select>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-800"></i>
+          </div>
+
+          <span>。</span>
+        </div>
+
+        <!-- 自訂學生自拍/頭像上傳區塊 (當選擇自拍時出現或隨時點擊展開) -->
+        <div id="avatar-upload-box" class="mt-4 p-4 rounded-xl bg-slate-800/90 border border-rose-400/40 hidden">
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="relative w-16 h-16 rounded-full border-2 border-rose-400 overflow-hidden bg-slate-700 flex-shrink-0 flex items-center justify-center">
+              <img id="avatar-preview-img" src="" alt="預覽" class="w-full h-full object-cover hidden">
+              <i id="avatar-placeholder-icon" class="fa-solid fa-camera text-2xl text-slate-400"></i>
+            </div>
+            <div class="flex-1 text-center sm:text-left">
+              <div class="text-sm font-bold text-rose-300">📸 學生自拍 / 自訂角色照片</div>
+              <p class="text-xs text-slate-400 mt-0.5">上傳或用平板自拍一張學生相片，提示詞會自動要求 AI 支援在遊戲中載入或以頭像圓圈為主角！</p>
+            </div>
+            <label class="cursor-pointer bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center gap-2">
+              <i class="fa-solid fa-upload"></i> 上傳相片/拍照
+              <input type="file" id="avatar-file-input" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- 進階遊戲效果自訂 (勾選題型特性) -->
+        <div class="pt-3 mt-3 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+            <input type="checkbox" id="feat-audio" checked onchange="updatePrompt()" class="rounded accent-rose-500">
+            <span>🔊 具備音效與語音</span>
+          </label>
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+            <input type="checkbox" id="feat-particles" checked onchange="updatePrompt()" class="rounded accent-rose-500">
+            <span>✨ 答對彩色彩帶特效</span>
+          </label>
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+            <input type="checkbox" id="feat-explanation" checked onchange="updatePrompt()" class="rounded accent-rose-500">
+            <span>💡 錯題即時解說提示</span>
+          </label>
+          <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+            <input type="checkbox" id="feat-fullscreen" checked onchange="updatePrompt()" class="rounded accent-rose-500">
+            <span>📱 適應平板觸控拖曳</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 最終生成的提示詞預覽框 -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-amber-300 tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-terminal"></i> 最終生成的 AI 提示詞 (Prompt)：
+          </label>
+          <span class="text-xs text-slate-400">已包含完整 HTML5 + JS 規格指示</span>
+        </div>
+
+        <div class="relative">
+          <textarea id="prompt-output" readonly rows="5" class="w-full bg-slate-950/90 text-amber-100 font-mono text-xs sm:text-sm p-4 rounded-2xl border border-amber-500/30 focus:outline-none shadow-inner no-scrollbar select-all leading-relaxed"></textarea>
+          
+          <div class="absolute right-3 bottom-3 flex items-center gap-2">
+            <button onclick="copyPromptText()" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-lg flex items-center gap-2 transition-all transform active:scale-95">
+              <i class="fa-regular fa-copy" id="copy-btn-icon"></i>
+              <span id="copy-btn-text">複製提示詞</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 複製大按鈕 -->
+        <button onclick="copyPromptText()" class="w-full py-3.5 px-6 rounded-2xl font-black text-base sm:text-lg bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-900 shadow-xl shadow-amber-950/40 flex items-center justify-center gap-2.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+          <i class="fa-solid fa-clipboard-check text-xl"></i>
+          <span>一鍵複製提示詞 (複製後即可貼到 Gemini)</span>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- 第二步：開啟機器人 & 測試預覽 -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- 開啟 Gemini / ChatGPT 捷徑 -->
+      <div class="glass-card rounded-3xl p-5 sm:p-6 border border-slate-700/60 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2.5 mb-3">
+            <span class="w-6 h-6 rounded-full bg-rose-500 text-white font-bold flex items-center justify-center text-xs">2</span>
+            <h3 class="text-base font-bold text-white">第二步 - 開啟 AI 機器人生成代碼</h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">
+            點擊下方按鈕開啟 <b>Gemini</b> 或 <b>ChatGPT</b>，直接把剛剛複製的提示詞貼上 (Ctrl+V 或 長按貼上)，AI 將會輸出完整的單一 HTML 檔案代碼！
+          </p>
+        </div>
+
+        <div class="space-y-2.5">
+          <a href="https://gemini.google.com" target="_blank" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-rose-500 hover:opacity-95 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all">
+            <i class="fa-solid fa-rocket"></i> 前往 Google Gemini (推薦)
+          </a>
+          <a href="https://chatgpt.com" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 border border-slate-600 transition-all">
+            <i class="fa-solid fa-comment-dots"></i> 開啟 ChatGPT
+          </a>
+        </div>
+      </div>
+
+      <!-- 程式碼沙盒測試 (貼上 AI 代碼立即試玩) -->
+      <div class="glass-card rounded-3xl p-5 sm:p-6 border border-slate-700/60 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2.5 mb-3">
+            <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-bold flex items-center justify-center text-xs">3</span>
+            <h3 class="text-base font-bold text-white">第三步 - 測試 AI 生成的遊戲</h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">
+            得到 AI 回傳的代碼後，點擊下方「即時預覽沙盒」將 HTML 代碼貼入，即可在平板或電腦上即時試玩遊戲！
+          </p>
+        </div>
+
+        <div class="space-y-2.5">
+          <button onclick="openSandboxModal()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all">
+            <i class="fa-solid fa-play"></i> 貼上代碼 & 即時試玩遊戲
+          </button>
+          <button onclick="openGoogleSitesModal()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 border border-amber-400/30 transition-all">
+            <i class="fa-solid fa-globe"></i> 取得 Google Sites 嵌入語法與教學
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- 頁尾說明 -->
+  <footer class="mt-10 mb-6 text-center text-xs text-slate-400">
+    <p>💡 提示：本工具特別為香港小學數學課堂設計，支援 iPad Safari、Chrome、電子白板及 Google 協作平台 (Google Sites) 零代碼直接嵌入。</p>
+  </footer>
+
+  <!-- 彈窗 1：即時程式碼測試沙盒 (Sandbox Modal) -->
+  <div id="sandbox-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <!-- 沙盒頂部 -->
+      <div class="p-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-rose-400 text-xl"><i class="fa-solid fa-gamepad"></i></span>
+          <h3 class="font-bold text-white text-base">遊戲即時測試沙盒</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="runSandboxCode()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all">
+            <i class="fa-solid fa-play"></i> 執行預覽
+          </button>
+          <button onclick="closeSandboxModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 沙盒主內容 (上方代碼輸入，下方/分頁預覽) -->
+      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 p-3 overflow-hidden bg-slate-950">
+        <!-- 代碼輸入區 -->
+        <div class="flex flex-col h-full bg-slate-900 rounded-xl p-3 border border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400">把 Gemini 回傳的完整 HTML 代碼貼在下方：</span>
+            <button onclick="loadSampleGame()" class="text-[11px] text-rose-300 hover:underline">載入示範遊戲</button>
+          </div>
+          <textarea id="sandbox-code-input" placeholder="請在此處貼上完整的 HTML 代碼..." class="flex-1 w-full bg-slate-950 text-slate-200 font-mono text-xs p-3 rounded-lg border border-slate-800 focus:border-rose-500 outline-none resize-none no-scrollbar"></textarea>
+        </div>
+
+        <!-- 即時渲染 iframe -->
+        <div class="flex flex-col h-full bg-slate-900 rounded-xl p-3 border border-slate-800">
+          <span class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen text-amber-400"></i> 平板畫面模擬預覽：
+          </span>
+          <div class="flex-1 bg-slate-950 rounded-lg overflow-hidden border border-slate-800 relative">
+            <iframe id="sandbox-iframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 彈窗 2：Google Sites 嵌入教學與工具 -->
+  <div id="gsites-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-5 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-brands fa-google text-amber-400 text-xl"></i>
+          <h3 class="font-bold text-white text-lg">如何嵌入至 Google 協作平台 (Google Sites)</h3>
+        </div>
+        <button onclick="closeGoogleSitesModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-5 text-sm text-slate-300">
+        <!-- 步驟說明 -->
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
+            <div>
+              <h4 class="font-bold text-white text-sm">複製 AI 輸出的完整 HTML 程式碼</h4>
+              <p class="text-xs text-slate-400 mt-0.5">將 Gemini 或 ChatGPT 生成的全部 HTML 程式碼複製起來。</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
+            <div>
+              <h4 class="font-bold text-white text-sm">打開 Google 協作平台 (Google Sites)</h4>
+              <p class="text-xs text-slate-400 mt-0.5">在右側工具列點選 <b>「插入 (Insert)」</b> ➔ 點擊 <b>「嵌入 (&lt;/&gt; Embed)」</b>。</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
+            <div>
+              <h4 class="font-bold text-white text-sm">選擇「嵌入代碼 (Embed Code)」並貼上</h4>
+              <p class="text-xs text-slate-400 mt-0.5">切換到「嵌入代碼」分頁，直接將 HTML 貼上，點擊「下一步」並插入即可！學生即可在網站上直接玩遊戲。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 協作平台快速範例卡 -->
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+          <div class="text-xs font-bold text-amber-300 mb-1.5 flex items-center justify-between">
+            <span>💻 協作平台最佳自訂大小設定建議：</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            建議將 Google Sites 的嵌入區塊寬度拉滿，高度調整為 <b>600px ~ 750px</b>，以便在 iPad 及電腦皆有最佳的觸控操作體驗。
+          </p>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-800/80 border-t border-slate-700 flex justify-end">
+        <button onclick="closeGoogleSitesModal()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all">
+          我明白了
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 訊息通知 -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-emerald-500 text-slate-950 font-bold py-3 px-5 rounded-2xl shadow-2xl flex items-center gap-3">
+    <i class="fa-solid fa-circle-check text-lg"></i>
+    <span id="toast-msg">提示詞已成功複製到剪貼簿！</span>
+  </div>
+
+  <!-- 核心邏輯 Javascript -->
+  <script>
+    // 課程數據庫 (針對香港小學四至六年級數學精選課題與學習目標)
+    const curriculumData = {
+      p4: {
+        name: "小學四年級 (P4)",
+        topics: [
+          {
+            id: "p4_fraction_comp",
+            title: "如何比較分數",
+            goals: [
+              "比較同分母分數的大小",
+              "比較同分子分數的大小",
+              "比較分數與基準值（例如 1/2 或 1）",
+              "認識真分數、假分數與帶分數"
+            ]
+          },
+          {
+            id: "p4_fraction_addsub",
+            title: "同分母分數加減法",
+            goals: [
+              "同分母分數的加法運算與約簡",
+              "同分母分數的減法運算",
+              "帶分數的同分母加減混合計算"
+            ]
+          },
+          {
+            id: "p4_decimal_intro",
+            title: "小數的初步認識",
+            goals: [
+              "認識十分位與百分位的值",
+              "比較一位及兩位小數的大小",
+              "分數與小數的互相轉換 (如 1/2 = 0.5)"
+            ]
+          },
+          {
+            id: "p4_perimeter_area",
+            title: "周界與面積計算",
+            goals: [
+              "計算正方形與長方形的周界",
+              "計算正方形與長方形的面積",
+              "周界與面積概念分辨"
+            ]
+          },
+          {
+            id: "p4_shapes",
+            title: "四邊形與多邊形特性",
+            goals: [
+              "分辨平行四邊形、菱形與梯形",
+              "辨認直角、銳角與鈍角",
+              "八個主要方向與方位認識"
+            ]
+          }
+        ]
+      },
+      p5: {
+        name: "小學五年級 (P5)",
+        topics: [
+          {
+            id: "p5_fraction_unlike",
+            title: "異分母分數加減法",
+            goals: [
+              "利用通分計算異分母分數加法",
+              "利用通分計算異分母分數減法",
+              "異分母分數加減混合計算與應用題"
+            ]
+          },
+          {
+            id: "p5_decimal_mult",
+            title: "小數乘法運算",
+            goals: [
+              "小數乘以整數的規律與小數點移動",
+              "小數乘以小數的乘積估算",
+              "小數四則混合運算"
+            ]
+          },
+          {
+            id: "p5_algebra_intro",
+            title: "代數符號與簡易方程",
+            goals: [
+              "用代數符號寫出算式 (例如 x + 5)",
+              "解一步計算的簡易方程 (加減法)",
+              "解一步計算的簡易方程 (乘除法)",
+              "利用方程解答簡易應用題"
+            ]
+          },
+          {
+            id: "p5_polygon_area",
+            title: "多邊形面積與體積",
+            goals: [
+              "三角形面積計算公式應用 (底×高÷2)",
+              "平行四邊形與梯形面積計算",
+              "長方體與正方體的體積 (立方厘米/米)"
+            ]
+          },
+          {
+            id: "p5_percentage_intro",
+            title: "百分數的初步認識",
+            goals: [
+              "認識百分數符號 (%) 及意義",
+              "百分數、分數與小數的互換",
+              "求一個數佔另一個數的百分之幾"
+            ]
+          }
+        ]
+      },
+      p6: {
+        name: "小學六年級 (P6)",
+        topics: [
+          {
+            id: "p6_fraction_div",
+            title: "分數除法與四則運算",
+            goals: [
+              "分數除以整數 (倒數概念)",
+              "整數除以分數與分數除以分數",
+              "分數四則混合計算與應用題"
+            ]
+          },
+          {
+            id: "p6_decimal_div",
+            title: "小數除法運算",
+            goals: [
+              "小數除以整數與商的小數點對齊",
+              "小數除以小數與擴分技巧",
+              "求商至指定小數位 (四捨五入)"
+            ]
+          },
+          {
+            id: "p6_percentage_app",
+            title: "百分數的應用",
+            goals: [
+              "計算折扣與售價問題 (幾折)",
+              "計算賺蝕與成本利潤率",
+              "求增加/減少的百分變化 (百分率)"
+            ]
+          },
+          {
+            id: "p6_circle",
+            title: "圓周與圓面積",
+            goals: [
+              "圓周公式 C = 2πr 或 πd 的計算",
+              "圓面積公式 A = πr² 的計算",
+              "求半圓與複合圖形的周界及面積"
+            ]
+          },
+          {
+            id: "p6_speed",
+            title: "速率與行程問題",
+            goals: [
+              "速率的單位 (m/s 及 km/h) 概念與換算",
+              "速率、時間與距離的公式互換",
+              "行程圖表的解讀與比較"
+            ]
+          }
+        ]
+      }
+    };
+
+    // 當前狀態
+    let currentGrade = 'p4';
+    let uploadedAvatarBase64 = null;
+
+    // 初始化頁面
+    window.addEventListener('DOMContentLoaded', () => {
+      setGrade('p4');
+    });
+
+    // 切換年級
+    function setGrade(gradeKey) {
+      currentGrade = gradeKey;
+      
+      // 更新按鈕外觀
+      ['p4', 'p5', 'p6'].forEach(g => {
+        const btn = document.getElementById(`btn-grade-${g}`);
+        if (g === gradeKey) {
+          btn.className = "grade-tab-btn py-2.5 sm:py-3 px-3 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-900/50";
+        } else {
+          btn.className = "grade-tab-btn py-2.5 sm:py-3 px-3 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700";
+        }
+      });
+
+      // 載入該年級課題
+      const topicSelect = document.getElementById('select-topic');
+      topicSelect.innerHTML = '';
+      
+      const topics = curriculumData[gradeKey].topics;
+      topics.forEach((t, idx) => {
+        const opt = document.createElement('option');
+        opt.value = t.title;
+        opt.textContent = t.title;
+        opt.dataset.index = idx;
+        topicSelect.appendChild(opt);
+      });
+
+      handleTopicChange();
+    }
+
+    // 當課題變動時，更新目標細項
+    function handleTopicChange() {
+      const topicSelect = document.getElementById('select-topic');
+      const selectedIndex = topicSelect.selectedIndex >= 0 ? topicSelect.selectedIndex : 0;
+      const topicData = curriculumData[currentGrade].topics[selectedIndex];
+
+      const goalSelect = document.getElementById('select-goal');
+      goalSelect.innerHTML = '';
+
+      if (topicData && topicData.goals) {
+        topicData.goals.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g;
+          opt.textContent = g;
+          goalSelect.appendChild(opt);
+        });
+      }
+
+      updatePrompt();
+    }
+
+    // 當角色變動時 (若選擇自拍上傳則顯示上傳框)
+    function handleCharacterChange() {
+      const charSelect = document.getElementById('select-character');
+      const uploadBox = document.getElementById('avatar-upload-box');
+      if (charSelect.value.includes('自拍') || charSelect.value.includes('自訂')) {
+        uploadBox.classList.remove('hidden');
+      } else {
+        uploadBox.classList.add('hidden');
+      }
+      updatePrompt();
+    }
+
+    // 處理頭像上載
+    function handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedAvatarBase64 = e.target.result;
+          const img = document.getElementById('avatar-preview-img');
+          const placeholder = document.getElementById('avatar-placeholder-icon');
+          img.src = uploadedAvatarBase64;
+          img.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+          showToast('📸 學生頭像上傳成功！已整合至遊戲設定。');
+          updatePrompt();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // 核心：組裝最精準且完整的 AI Prompt
+    function updatePrompt() {
+      const gradeName = curriculumData[currentGrade].name;
+      const device = document.getElementById('select-device').value;
+      const gameType = document.getElementById('select-game-type').value;
+      const playerMode = document.getElementById('select-player-mode').value;
+      const topic = document.getElementById('select-topic').value;
+      const goal = document.getElementById('select-goal').value;
+      const character = document.getElementById('select-character').value;
+
+      const featAudio = document.getElementById('feat-audio').checked;
+      const featParticles = document.getElementById('feat-particles').checked;
+      const featExplanation = document.getElementById('feat-explanation').checked;
+      const featFullscreen = document.getElementById('feat-fullscreen').checked;
+
+      // 構建結構化專業 Prompt
+      let prompt = `請為【${gradeName}】的學生，在【${device}】上編寫一個完整的單一 HTML5 互動遊戲檔案（包含所有 HTML、CSS 與 JavaScript 代碼，無需外置檔案，可直接嵌入 Google Sites 運作）。
+
+【遊戲設計規格要求】：
+1. 數學課題與學習目標：
+   - 課題：${topic}
+   - 核心學習目標：${goal}
+   - 題型設計：針對此年級深度，隨機生成符合目標的題目，包含隨機正解與合理的誘答選項。
+
+2. 遊戲玩法與模式：
+   - 核心機制：${gameType}
+   - 遊玩模式：${playerMode}
+   ${playerMode.includes('雙人') ? '- 雙人模式請特別設計左右分屏或上下分區控制，讓兩位學生在同一部平板或電腦上進行即時競賽或合作。' : ''}
+
+3. 角色與主題視覺：
+   - 視覺風格：讓遊戲主角與元素看起來像「${character}」，採用色彩繽紛可愛、吸睛且具親和力的繪本/向量風格（使用純 CSS/SVG/Emoji 繪製，確保圖片不失真不破圖）。
+   ${character.includes('自拍') || uploadedAvatarBase64 ? '- 請在遊戲開頭提供相片自拍/上傳按鈕，並將自拍相片動態裁切為圓形頭像作為遊戲主角！' : ''}
+
+4. 互動與特效增強：
+   ${featAudio ? '- 整合 Web Audio API 合成音效（答對清脆音、答錯提示音、背景歡樂節奏音樂開關）。' : ''}
+   ${featParticles ? '- 答對時觸發全螢幕繽紛彩帶/星星粒子爆炸特效 (Canvas Confetti)。' : ''}
+   ${featExplanation ? '- 答錯時彈出溫馨簡潔的解題指引與正確計算提示，幫助學生自主學習。' : ''}
+   ${featFullscreen ? '- 完美支援平板觸控拖曳 (Touch Event) 與滑鼠點擊，按鈕夠大、介面防誤觸。' : ''}
+   - 具備得分排行榜、連擊計數器 (Combo) 及結算成績單星級評分 (1~3顆星)。
+
+5. 輸出規範：
+   - 請直接輸出完整的單一 HTML 檔案代碼，使用 Tailwind CSS 或內建 CSS，務必可在瀏覽器直接打開並正常運行！`;
+
+      document.getElementById('prompt-output').value = prompt;
+    }
+
+    // 一鍵複製提示詞 (支援 iframe 安全相容性)
+    function copyPromptText() {
+      const textarea = document.getElementById('prompt-output');
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+
+      let success = false;
+      try {
+        success = document.execCommand('copy');
+      } catch (err) {
+        success = false;
+      }
+
+      if (!success && navigator.clipboard) {
+        navigator.clipboard.writeText(textarea.value).then(() => {
+          showCopySuccess();
+        });
+      } else {
+        showCopySuccess();
+      }
+    }
+
+    function showCopySuccess() {
+      const btnText = document.getElementById('copy-btn-text');
+      const btnIcon = document.getElementById('copy-btn-icon');
+      
+      btnText.textContent = "已複製！";
+      btnIcon.className = "fa-solid fa-check text-emerald-700";
+      
+      showToast("✨ 提示詞已複製！可前往 Gemini / ChatGPT 貼上生成代碼。");
+
+      setTimeout(() => {
+        btnText.textContent = "複製提示詞";
+        btnIcon.className = "fa-regular fa-copy";
+      }, 2500);
+    }
+
+    // 彈出 Toast 通知
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      toastMsg.textContent = msg;
+      
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    // 沙盒彈窗控制
+    function openSandboxModal() {
+      document.getElementById('sandbox-modal').classList.remove('hidden');
+    }
+    function closeSandboxModal() {
+      document.getElementById('sandbox-modal').classList.add('hidden');
+    }
+
+    // 執行沙盒內的 HTML 代碼
+    function runSandboxCode() {
+      const code = document.getElementById('sandbox-code-input').value;
+      const iframe = document.getElementById('sandbox-iframe');
+      
+      if (!code.trim()) {
+        showToast("⚠️ 請先貼上 HTML 程式碼再執行！");
+        return;
+      }
+
+      const blob = new Blob([code], { type: 'text/html' });
+      iframe.src = URL.createObjectURL(blob);
+      showToast("🚀 遊戲已成功載入並運行！");
+    }
+
+    // 載入內建模擬示範小遊戲 (接魚分數小遊戲)
+    function loadSampleGame() {
+      const sampleHTML = `<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分數接魚小遊戲</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <style>
+    body { margin:0; background: #0c4a6e; color: white; font-family: sans-serif; overflow: hidden; touch-action: none; text-align: center; }
+    #canvas { background: linear-gradient(to bottom, #38bdf8, #0369a1); display: block; margin: 0 auto; width: 100%; height: 100vh; max-width: 480px; }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center">
+  <div class="absolute top-2 w-full max-w-md flex justify-between px-4 z-10 font-bold text-sm">
+    <div class="bg-sky-900/80 px-3 py-1 rounded-full">目標：接住 <span class="text-yellow-300 font-black">> 1/2</span> 的分數魚 🐟</div>
+    <div class="bg-amber-500 text-slate-900 px-3 py-1 rounded-full">得分：<span id="score">0</span></div>
+  </div>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    function resize() {
+      width = canvas.width = Math.min(window.innerWidth, 480);
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let score = 0;
+    let basketX = width / 2;
+    const items = [];
+    const fractions = [
+      { text: "3/4", val: 0.75, correct: true },
+      { text: "2/3", val: 0.66, correct: true },
+      { text: "5/6", val: 0.83, correct: true },
+      { text: "1/4", val: 0.25, correct: false },
+      { text: "1/3", val: 0.33, correct: false },
+      { text: "2/5", val: 0.4, correct: false }
+    ];
+
+    function spawnItem() {
+      const f = fractions[Math.floor(Math.random() * fractions.length)];
+      items.push({ x: Math.random() * (width - 60) + 30, y: -20, ...f, speed: 2 + Math.random() * 2 });
+    }
+    setInterval(spawnItem, 1200);
+
+    function handleMove(clientX) {
+      const rect = canvas.getBoundingClientRect();
+      basketX = Math.max(30, Math.min(width - 30, clientX - rect.left));
+    }
+    window.addEventListener('mousemove', e => handleMove(e.clientX));
+    window.addEventListener('touchmove', e => { if(e.touches[0]) handleMove(e.touches[0].clientX); });
+
+    function loop() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 畫主角籃子 / 貓咪
+      ctx.font = "36px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("🐱🧺", basketX, height - 30);
+
+      // 畫掉落的分數魚
+      for(let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y += item.speed;
+
+        ctx.font = "24px sans-serif";
+        ctx.fillText("🐟", item.x, item.y);
+        ctx.font = "bold 14px sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(item.text, item.x, item.y - 12);
+
+        // 接到判斷
+        if(item.y > height - 60 && Math.abs(item.x - basketX) < 40) {
+          if(item.correct) {
+            score += 10;
+          } else {
+            score = Math.max(0, score - 5);
+          }
+          document.getElementById('score').innerText = score;
+          items.splice(i, 1);
+          continue;
+        }
+
+        if(item.y > height) {
+          items.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  <\/script>
+</body>
+</html>`;
+      document.getElementById('sandbox-code-input').value = sampleHTML;
+      runSandboxCode();
+    }
+
+    // Google Sites Modal 控制
+    function openGoogleSitesModal() {
+      document.getElementById('gsites-modal').classList.remove('hidden');
+    }
+    function closeGoogleSitesModal() {
+      document.getElementById('gsites-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
