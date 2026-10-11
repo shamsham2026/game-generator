@@ -3,16 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🎮 AI 數學遊戲提示詞生成器與自學出題系統</title>
-  <!-- Tailwind CSS -->
+  <title>數學練習遊戲平台 · 個人化溫習</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="css/app.css">
   <script>
     tailwind.config = {
       theme: {
@@ -33,294 +30,324 @@
       }
     }
   </script>
-
-  <style>
-    body {
-      background: radial-gradient(circle at 50% 0%, #1e2b48 0%, #0d1424 50%, #060911 100%);
-      min-height: 100vh;
-      color: #f8fafc;
-      font-family: 'Noto Sans TC', sans-serif;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* 模擬 iPad 截圖中醒目的黃色自訂膠囊按鈕 */
-    .custom-pill {
-      background: #fbbf24;
-      color: #111827;
-      font-weight: 700;
-      border-radius: 9999px;
-      padding: 0.38rem 1.05rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      border: 2px solid #f59e0b;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      box-shadow: 0 4px 14px rgba(251, 191, 36, 0.3);
-      transition: all 0.15s ease-in-out;
-      line-height: 1.3;
-    }
-    .custom-pill:active, .custom-pill.active-pill {
-      transform: scale(0.96);
-      background: #f59e0b;
-      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.5);
-    }
-
-    /* 針對 iPad 照片中的精美磨砂半透明懸浮彈出式選單 */
-    .ios-popover {
-      background: rgba(226, 238, 255, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 18px;
-    }
-
-    .ios-option {
-      padding: 0.65rem 1.25rem;
-      color: #1e293b;
-      font-weight: 600;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-      cursor: pointer;
-      transition: background 0.12s ease;
-      user-select: none;
-    }
-    .ios-option:last-child {
-      border-bottom: none;
-    }
-    .ios-option:hover, .ios-option:active {
-      background: rgba(255, 255, 255, 0.7);
-    }
-    .ios-option.selected {
-      color: #0f172a;
-      font-weight: 800;
-    }
-
-    /* 垂直直式分數排版展示 */
-    .math-frac {
-      display: inline-flex;
-      flex-direction: column;
-      vertical-align: middle;
-      text-align: center;
-      padding: 0 3px;
-      line-height: 1;
-      font-weight: bold;
-    }
-    .math-num {
-      border-bottom: 2px solid currentColor;
-      padding-bottom: 1px;
-    }
-    .math-den {
-      padding-top: 1px;
-    }
-  </style>
 </head>
 <body class="p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start min-h-screen">
 
-  <!-- 頂部標題（參考照片中金黃色🎮標題風格） -->
-  <header class="w-full max-w-4xl text-center mb-6 pt-2">
-    <h1 class="text-2xl sm:text-4xl font-black text-amber-400 flex items-center justify-center gap-3 tracking-wide">
-      <span class="text-3xl sm:text-4xl">🎮</span>
-      <span>設計提示詞</span>
-    </h1>
-    <p class="text-slate-400 text-xs sm:text-sm mt-1.5">
-      專為小學課堂與自學設計・支援隨機出題、防亂碼與題目拍照！
-    </p>
-  </header>
+  <!-- ========== 首頁：雙入口 ========== -->
+  <section data-view="home" class="w-full max-w-4xl">
+    <header class="text-center mb-8 pt-4">
+      <p class="brand-mark text-amber-400 text-3xl sm:text-5xl font-bold mb-3">MathPlay 練習島</p>
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-100 max-w-xl mx-auto leading-snug">
+        溫習變成遊戲・每次登入都有針對性建議
+      </h1>
+      <p class="text-slate-400 text-sm mt-3 max-w-lg mx-auto">
+        課本課題鎖定不變；教師可上載進度表、按範疇加練習；學生以班別學號進入，題目每次隨機。
+      </p>
+      <p id="conn-badge" class="conn-badge conn-local mt-4 inline-flex">檢查連線中…</p>
+    </header>
 
-  <main class="w-full max-w-4xl space-y-6">
+    <div class="grid sm:grid-cols-3 gap-4">
+      <button type="button" onclick="App.openPromptGenerator()" class="panel role-card p-6 text-left sm:col-span-1 border-amber-400/40">
+        <div class="w-11 h-11 rounded-2xl bg-amber-400/25 text-amber-300 flex items-center justify-center mb-4">
+          <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-1">提示詞產生器</h2>
+        <p class="text-sm text-slate-400">原有功能完整保留・黃色膠囊造句・複製到 Gemini</p>
+      </button>
+      <button type="button" onclick="document.getElementById('student-login-panel').classList.remove('hidden')" class="panel role-card p-6 text-left">
+        <div class="w-11 h-11 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center mb-4">
+          <i class="fa-solid fa-user-graduate text-lg"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-1">學生練習</h2>
+        <p class="text-sm text-slate-400">班別 + 學號登入・建議課題・隨機出題・持續分析</p>
+      </button>
+      <button type="button" onclick="App.openTeacher()" class="panel role-card p-6 text-left">
+        <div class="w-11 h-11 rounded-2xl bg-emerald-400/15 text-emerald-300 flex items-center justify-center mb-4">
+          <i class="fa-solid fa-chalkboard-user text-lg"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-1">教師管理</h2>
+        <p class="text-sm text-slate-400">進度表・範疇練習庫・班別總覽</p>
+      </button>
+    </div>
 
-    <!-- 第一步：選擇並複製 (主卡片) -->
-    <section class="bg-cardbg/90 rounded-3xl p-5 sm:p-7 shadow-2xl border border-slate-700/70 relative">
-      
-      <!-- 步驟 1 標籤 -->
-      <div class="flex items-center justify-between pb-3 border-b border-slate-700/60 mb-5">
-        <h2 class="text-base sm:text-lg font-bold text-slate-300 tracking-wide flex items-center gap-2">
-          <span>第一步 - 選擇年級並自訂</span>
-        </h2>
-        <span class="text-xs px-3 py-1 rounded-full bg-slate-800 text-amber-300 border border-amber-400/30 font-medium">
-          <i class="fa-solid fa-hand-pointer mr-1"></i> 點選黃色標籤即可切換
-        </span>
-      </div>
-
-      <!-- 年級選擇切換標籤 (小四 / 小五 / 小六) -->
-      <div class="mb-5">
-        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-          <i class="fa-solid fa-graduation-cap text-amber-400 mr-1"></i> 選擇年級：
+    <div id="student-login-panel" class="hidden panel mt-5 p-5 sm:p-6">
+      <h3 class="font-bold text-slate-200 mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-right-to-bracket text-amber-400"></i> 學生登入
+      </h3>
+      <div class="grid sm:grid-cols-3 gap-3 mb-4">
+        <label class="block text-xs text-slate-400">班別
+          <input id="student-class" class="field mt-1" placeholder="例：4A" autocomplete="off">
         </label>
-        <div class="grid grid-cols-3 gap-2.5 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-700/80">
-          <button type="button" onclick="setGrade('p4')" id="btn-grade-p4" class="py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-amber-400 text-slate-950 shadow-md">
-            <span>小學四年級</span>
-          </button>
-          <button type="button" onclick="setGrade('p5')" id="btn-grade-p5" class="py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white">
-            <span>小學五年級</span>
-          </button>
-          <button type="button" onclick="setGrade('p6')" id="btn-grade-p6" class="py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white">
-            <span>小學六年級</span>
-          </button>
-        </div>
+        <label class="block text-xs text-slate-400">學號
+          <input id="student-no" class="field mt-1" placeholder="例：12" autocomplete="off">
+        </label>
+        <label class="block text-xs text-slate-400">年級
+          <select id="student-grade" class="field mt-1"></select>
+        </label>
       </div>
+      <button type="button" onclick="App.enterStudent()" class="w-full py-3 rounded-2xl font-black bg-amber-400 text-slate-950 hover:bg-amber-300">
+        進入我的練習畫面
+      </button>
+    </div>
 
-      <!-- 互動造句區域 (高度還原使用者平板照片之藍底與黃色膠囊排列) -->
-      <div class="bg-slate-900/90 rounded-2xl p-4 sm:p-6 border border-slate-700/80 mb-5 relative">
-        <div class="leading-loose text-sm sm:text-base md:text-lg text-slate-100 flex flex-wrap items-center gap-y-3 gap-x-2">
-          <span>在</span>
+    <details class="panel mt-5 p-4 text-sm text-slate-300">
+      <summary class="cursor-pointer font-bold text-slate-200">內容結構說明（給設計／開發）</summary>
+      <ol class="list-decimal ml-5 mt-3 space-y-2 text-slate-400 leading-relaxed">
+        <li><b class="text-slate-200">鎖定層 Curriculum</b>：年級 → 課題 → 學習目標（課本，不可修改）。</li>
+        <li><b class="text-slate-200">進度表 Schedule</b>：只參照課題／目標 id，可上載週次與日期，不可改目標字句。</li>
+        <li><b class="text-slate-200">範疇練習 PracticeBank</b>：按概念／運算／應用／圖形／遊戲新增，fingerprint 防重複。</li>
+        <li><b class="text-slate-200">學生 Student</b>：班別+學號；sessions／attempts 累積分析。</li>
+        <li><b class="text-slate-200">推薦 Recommend</b>：弱項 + 進度表時程 + 久未練習 → 登入建議。</li>
+        <li><b class="text-slate-200">出題 QuestionEngine</b>：每次開局新 seed，純演算法隨機，局內去重。</li>
+      </ol>
+    </details>
+  </section>
 
-          <!-- 裝置選單膠囊 -->
-          <button type="button" id="pill-device" onclick="openPopover('device', this)" class="custom-pill">
-            <span id="label-device">平板電腦 📱</span>
-            <i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i>
-          </button>
+  <!-- ========== 學生主頁 ========== -->
+  <section data-view="student" class="w-full max-w-4xl hidden">
+    <header class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <div>
+        <p class="brand-mark text-amber-400 text-2xl font-bold">MathPlay 練習島</p>
+        <p class="text-sm text-slate-300 mt-1">
+          <span id="student-badge" class="font-bold text-white"></span>
+          <span class="mx-2 text-slate-600">|</span>
+          <span id="student-grade-label"></span>
+        </p>
+      </div>
+      <button type="button" onclick="App.logoutStudent()" class="text-xs px-3 py-2 rounded-xl border border-slate-600 text-slate-300 hover:text-white">登出</button>
+    </header>
 
-          <span>，編寫程式碼製作</span>
+    <div class="panel p-5 sm:p-6 mb-4">
+      <h2 class="text-base font-bold text-slate-200 mb-1 flex items-center gap-2">
+        <i class="fa-solid fa-compass text-amber-400"></i> 而家建議先練
+      </h2>
+      <p class="text-xs text-slate-400 mb-4">根據進度表、錯題與久未練習自動排序；每次開局題目重新隨機。</p>
+      <div id="suggest-list" class="space-y-3"></div>
+    </div>
 
-          <!-- 遊戲玩法膠囊 -->
-          <button type="button" id="pill-gameType" onclick="openPopover('gameType', this)" class="custom-pill">
-            <span id="label-gameType">接球 🧺</span>
-            <i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i>
-          </button>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="panel p-5">
+        <h3 class="font-bold text-slate-200 mb-3 text-sm">最近練習</h3>
+        <ul id="recent-sessions"></ul>
+      </div>
+      <div class="panel p-5">
+        <h3 class="font-bold text-slate-200 mb-3 text-sm">範疇練習（教師新增）</h3>
+        <div id="practice-bank-student" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+  </section>
 
-          <!-- 模式膠囊 (單人/雙人對戰) -->
-          <button type="button" id="pill-mode" onclick="openPopover('mode', this)" class="custom-pill !bg-amber-300">
-            <span id="label-mode">單人練習 👤</span>
-            <i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i>
-          </button>
+  <!-- ========== 練習作答 ========== -->
+  <section data-view="practice" class="w-full max-w-2xl hidden">
+    <div class="panel p-5 sm:p-7">
+      <div class="flex items-center justify-between mb-4">
+        <button type="button" onclick="App.backToStudent()" class="text-xs text-slate-400 hover:text-white" id="btn-back-student">
+          <i class="fa-solid fa-arrow-left mr-1"></i> 返回建議
+        </button>
+        <span id="practice-progress" class="text-xs font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-3 py-1 rounded-full"></span>
+      </div>
+      <p id="practice-meta" class="text-[11px] text-slate-500 mb-4"></p>
+      <div id="practice-prompt" class="text-xl sm:text-2xl font-bold text-center text-white leading-relaxed min-h-[4.5rem] mb-6"></div>
+      <div id="practice-choices" class="space-y-2.5 mb-4"></div>
+      <div id="practice-input-wrap" class="hidden mb-4">
+        <input id="practice-input" class="field text-center text-lg font-bold" placeholder="輸入答案" autocomplete="off"
+          onkeydown="if(event.key==='Enter')App.submitAnswer()">
+        <button type="button" onclick="App.submitAnswer()" class="w-full mt-3 py-3 rounded-2xl font-black bg-amber-400 text-slate-950">提交</button>
+      </div>
+      <div id="practice-feedback" class="text-sm min-h-[1.25rem]"></div>
+    </div>
+  </section>
 
-          <span>遊戲幫助學生學習</span>
+  <!-- ========== 教師端 ========== -->
+  <section data-view="teacher" class="w-full max-w-4xl hidden space-y-5">
+    <header class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="brand-mark text-amber-400 text-2xl font-bold">教師工作台</p>
+        <p class="text-xs text-slate-400 mt-1">課題目標鎖定 · 可加範疇練習 · 可上載進度表 · 可設計遊戲提示詞</p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" onclick="App.exportData()" class="text-xs px-3 py-2 rounded-xl border border-slate-600 text-slate-300">匯出 DB</button>
+        <button type="button" onclick="App.showView('home')" class="text-xs px-3 py-2 rounded-xl border border-slate-600 text-slate-300">返回首頁</button>
+      </div>
+    </header>
 
-          <!-- 課題膠囊 -->
-          <button type="button" id="pill-topic" onclick="openPopover('topic', this)" class="custom-pill">
-            <span id="label-topic">如何比較分數</span>
-            <i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i>
-          </button>
+    <div class="flex flex-wrap gap-2 panel p-2">
+      <button type="button" class="tab-btn active" data-tab="tab-schedule" onclick="switchTeacherTab('tab-schedule')">進度表</button>
+      <button type="button" class="tab-btn" data-tab="tab-practice" onclick="switchTeacherTab('tab-practice')">範疇練習</button>
+      <button type="button" class="tab-btn" data-tab="tab-class" onclick="switchTeacherTab('tab-class')">班別總覽</button>
+      <button type="button" class="tab-btn" data-tab="tab-curriculum" onclick="switchTeacherTab('tab-curriculum')">鎖定課題</button>
+      <button type="button" class="tab-btn" data-tab="tab-generator" onclick="switchTeacherTab('tab-generator')">遊戲提示詞</button>
+    </div>
 
-          <span>的「</span>
+    <!-- 進度表 -->
+    <div id="tab-schedule" class="teacher-tab panel p-5 sm:p-6">
+      <h3 class="font-bold text-slate-200 mb-2">上載各年級進度表</h3>
+      <p class="text-xs text-slate-400 mb-4">CSV 欄位：week, topic, goal, startDate, endDate, note。topic／goal 必須與課本完全對應；系統只存參照，不會改寫目標。</p>
+      <div class="grid sm:grid-cols-2 gap-3 mb-3">
+        <label class="text-xs text-slate-400">年級<select id="schedule-grade" class="field mt-1"></select></label>
+        <label class="text-xs text-slate-400">CSV 檔案<input id="schedule-file" type="file" accept=".csv,text/csv,text/plain" class="field mt-1"></label>
+      </div>
+      <label class="text-xs text-slate-400 block mb-3">或直接貼上
+        <textarea id="schedule-paste" rows="5" class="field mt-1 font-mono text-xs" placeholder="week,topic,goal,startDate,endDate&#10;1,如何比較分數,比較分數與基準值（例如 1/2 或 1）,2026-09-01,2026-09-14"></textarea>
+      </label>
+      <button type="button" onclick="App.uploadSchedule()" class="custom-pill">匯入進度表</button>
+      <div id="schedule-result" class="mt-4"></div>
+    </div>
 
-          <!-- 學習目標膠囊 -->
-          <button type="button" id="pill-goal" onclick="openPopover('goal', this)" class="custom-pill !bg-amber-200">
-            <span id="label-goal">比較分數與基準值（例如 1/2 或 1）</span>
-            <i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i>
-          </button>
+    <!-- 範疇練習 -->
+    <div id="tab-practice" class="teacher-tab panel p-5 sm:p-6 hidden">
+      <h3 class="font-bold text-slate-200 mb-2">按範疇新增練習（不改課題目標）</h3>
+      <p id="prac-goal-lock-note" class="text-xs text-amber-300/90 mb-4"></p>
+      <form onsubmit="App.addPracticeFromForm(event)" class="grid sm:grid-cols-2 gap-3">
+        <label class="text-xs text-slate-400">年級<select id="prac-grade" class="field mt-1"></select></label>
+        <label class="text-xs text-slate-400">範疇<select id="prac-category" class="field mt-1"></select></label>
+        <label class="text-xs text-slate-400 sm:col-span-2">課題（鎖定）<select id="prac-topic" class="field mt-1"></select></label>
+        <label class="text-xs text-slate-400 sm:col-span-2">學習目標（鎖定・只可選）<select id="prac-goal" class="field mt-1"></select></label>
+        <label class="text-xs text-slate-400 sm:col-span-2">練習名稱<input id="prac-title" class="field mt-1" placeholder="例：基準值 1/2 接球變式" required></label>
+        <label class="text-xs text-slate-400 sm:col-span-2">練習說明／提示詞附註<textarea id="prac-hint" rows="2" class="field mt-1" placeholder="描述此練習的出題重點（用於去重與遊戲生成）"></textarea></label>
+        <label class="text-xs text-slate-400">建議遊戲形式<select id="prac-game" class="field mt-1"></select></label>
+        <label class="text-xs text-slate-400 flex items-center gap-2 mt-6">
+          <input id="prac-verified" type="checkbox" checked class="w-4 h-4"> 已核對內容準確
+        </label>
+        <div class="sm:col-span-2">
+          <button type="submit" class="custom-pill">新增練習（自動防重複）</button>
+        </div>
+      </form>
+      <h4 class="font-bold text-slate-300 text-sm mt-6 mb-2">本年級練習庫</h4>
+      <ul id="teacher-bank-list"></ul>
+    </div>
 
-          <span>」。請讓遊戲元素看起來像</span>
+    <!-- 班別總覽（連線後可見全班） -->
+    <div id="tab-class" class="teacher-tab panel p-5 sm:p-6 hidden">
+      <h3 class="font-bold text-slate-200 mb-2">班別練習總覽</h3>
+      <p class="text-xs text-slate-400 mb-4">連線模式下可即時查看全班登入與平均分；離線模式只顯示本機瀏覽器資料。</p>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <input id="class-overview-code" class="field max-w-[10rem]" placeholder="班別 例：4A" value="4A">
+        <button type="button" onclick="App.refreshClassOverview()" class="custom-pill">重新整理</button>
+      </div>
+      <div id="class-overview-result" class="text-slate-300"></div>
+    </div>
 
-          <!-- 角色膠囊 -->
-          <button type="button" id="pill-character" onclick="openPopover('character', this)" class="custom-pill">
-            <span id="label-character">魚 🐟</span>
-            <i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i>
-          </button>
+    <!-- 鎖定課題一覽 -->
+    <div id="tab-curriculum" class="teacher-tab panel p-5 sm:p-6 hidden">
+      <h3 class="font-bold text-slate-200 mb-4">課本課題與目標（唯讀）</h3>
+      <div id="curriculum-lock-panel" class="space-y-4"></div>
+    </div>
 
-          <span>。</span>
+    <!-- 遊戲提示詞產生器（原功能完整保留） -->
+    <div id="tab-generator" class="teacher-tab hidden space-y-5">
+      <div class="text-center mb-1">
+        <h2 class="brand-mark text-2xl sm:text-3xl font-bold text-amber-400 flex items-center justify-center gap-2">
+          <span>🎮</span><span>設計提示詞</span>
+        </h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-1.5">專為小學課堂與自學設計・支援隨機出題、防亂碼與題目拍照！</p>
+      </div>
+      <section class="panel p-5 sm:p-7 relative">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-700/60 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-slate-300 tracking-wide">第一步 - 選擇年級並自訂</h2>
+          <span class="text-xs px-3 py-1 rounded-full bg-slate-800 text-amber-300 border border-amber-400/30 font-medium">
+            <i class="fa-solid fa-hand-pointer mr-1"></i> 點選黃色標籤即可切換
+          </span>
         </div>
 
-        <!-- 角色自拍照片上載抽屜 (若選擇照片做主角時顯示) -->
-        <div id="avatar-drawer" class="hidden mt-4 p-3.5 rounded-xl bg-slate-800/80 border border-amber-400/40">
-          <div class="flex flex-col sm:flex-row items-center gap-3">
-            <div class="w-14 h-14 rounded-full border-2 border-amber-400 overflow-hidden bg-slate-900 flex-shrink-0 flex items-center justify-center shadow-inner">
-              <img id="avatar-preview-img" src="" alt="自拍頭像" class="w-full h-full object-cover hidden">
-              <i id="avatar-placeholder-icon" class="fa-solid fa-camera text-xl text-amber-300"></i>
-            </div>
-            <div class="flex-1 text-center sm:text-left">
-              <h4 class="text-xs sm:text-sm font-bold text-amber-200">📸 學生自拍 / 自訂主角照片</h4>
-              <p class="text-[11px] text-slate-300">使用平板拍照或上傳學生照片，提示詞將要求 AI 將此照片作為遊戲主角頭像！</p>
-            </div>
-            <label class="cursor-pointer bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black py-2 px-3.5 rounded-xl shadow transition-all flex items-center gap-1.5 active:scale-95">
-              <i class="fa-solid fa-camera"></i> 拍照 / 上載照片
-              <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="handleAvatarFile(event)">
-            </label>
+        <div class="mb-5">
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-graduation-cap text-amber-400 mr-1"></i> 選擇年級：
+          </label>
+          <div class="grid grid-cols-3 gap-2.5 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-700/80">
+            <button type="button" onclick="PromptGenerator.setGrade('p4')" id="btn-grade-p4" class="py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-amber-400 text-slate-950 shadow-md"><span>小學四年級</span></button>
+            <button type="button" onclick="PromptGenerator.setGrade('p5')" id="btn-grade-p5" class="py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white"><span>小學五年級</span></button>
+            <button type="button" onclick="PromptGenerator.setGrade('p6')" id="btn-grade-p6" class="py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white"><span>小學六年級</span></button>
           </div>
         </div>
 
-        <!-- 難點題目拍照上傳 (模仿出題機制) -->
-        <div class="mt-4 p-3.5 rounded-xl bg-slate-950/70 border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center justify-center text-sm flex-shrink-0">
-              <i class="fa-solid fa-file-circle-question"></i>
-            </div>
-            <div>
-              <div class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5">
-                <span>📸 上載自學難點題目照片（AI 模仿隨機出題）</span>
-                <span id="badge-exercise-status" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/40 font-semibold">已載入</span>
+        <div class="bg-slate-900/90 rounded-2xl p-4 sm:p-6 border border-slate-700/80 mb-5 relative">
+          <div class="leading-loose text-sm sm:text-base md:text-lg text-slate-100 flex flex-wrap items-center gap-y-3 gap-x-2">
+            <span>在</span>
+            <button type="button" id="pill-device" onclick="PromptGenerator.openPopover('device', this)" class="custom-pill"><span id="label-device">平板電腦 📱</span><i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i></button>
+            <span>，編寫程式碼製作</span>
+            <button type="button" id="pill-gameType" onclick="PromptGenerator.openPopover('gameType', this)" class="custom-pill"><span id="label-gameType">接球 🧺</span><i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i></button>
+            <button type="button" id="pill-mode" onclick="PromptGenerator.openPopover('mode', this)" class="custom-pill !bg-amber-300"><span id="label-mode">單人練習 👤</span><i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i></button>
+            <span>遊戲幫助學生學習</span>
+            <button type="button" id="pill-topic" onclick="PromptGenerator.openPopover('topic', this)" class="custom-pill"><span id="label-topic">如何比較分數</span><i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i></button>
+            <span>的「</span>
+            <button type="button" id="pill-goal" onclick="PromptGenerator.openPopover('goal', this)" class="custom-pill !bg-amber-200"><span id="label-goal">比較分數與基準值（例如 1/2 或 1）</span><i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i></button>
+            <span>」。請讓遊戲元素看起來像</span>
+            <button type="button" id="pill-character" onclick="PromptGenerator.openPopover('character', this)" class="custom-pill"><span id="label-character">魚 🐟</span><i class="fa-solid fa-chevron-down text-xs ml-0.5 text-slate-800"></i></button>
+            <span>。</span>
+          </div>
+
+          <div id="avatar-drawer" class="hidden mt-4 p-3.5 rounded-xl bg-slate-800/80 border border-amber-400/40">
+            <div class="flex flex-col sm:flex-row items-center gap-3">
+              <div class="w-14 h-14 rounded-full border-2 border-amber-400 overflow-hidden bg-slate-900 flex-shrink-0 flex items-center justify-center shadow-inner">
+                <img id="avatar-preview-img" src="" alt="自拍頭像" class="w-full h-full object-cover hidden">
+                <i id="avatar-placeholder-icon" class="fa-solid fa-camera text-xl text-amber-300"></i>
               </div>
-              <p class="text-[11px] text-slate-400">拍攝工作紙上的錯題，提示詞將要求 AI 解析該結構並無限隨機生成同款變化題！</p>
+              <div class="flex-1 text-center sm:text-left">
+                <h4 class="text-xs sm:text-sm font-bold text-amber-200">📸 學生自拍 / 自訂主角照片</h4>
+                <p class="text-[11px] text-slate-300">使用平板拍照或上傳學生照片，提示詞將要求 AI 將此照片作為遊戲主角頭像！</p>
+              </div>
+              <label class="cursor-pointer bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black py-2 px-3.5 rounded-xl shadow transition-all flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-camera"></i> 拍照 / 上載照片
+                <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="PromptGenerator.handleAvatarFile(event)">
+              </label>
             </div>
           </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+
+          <div class="mt-4 p-3.5 rounded-xl bg-slate-950/70 border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-file-circle-question"></i></div>
+              <div>
+                <div class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                  <span>📸 上載自學難點題目照片（AI 模仿隨機出題）</span>
+                  <span id="badge-exercise-status" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/40 font-semibold">已載入</span>
+                </div>
+                <p class="text-[11px] text-slate-400">拍攝工作紙上的錯題，提示詞將要求 AI 解析該結構並無限隨機生成同款變化題！</p>
+              </div>
+            </div>
             <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2 px-3.5 rounded-xl border border-slate-600 transition-all flex items-center gap-1.5 active:scale-95">
               <i class="fa-solid fa-upload"></i> 上載錯題照片
-              <input type="file" id="exercise-input" accept="image/*" class="hidden" onchange="handleExerciseFile(event)">
+              <input type="file" id="exercise-input" accept="image/*" class="hidden" onchange="PromptGenerator.handleExerciseFile(event)">
             </label>
           </div>
         </div>
 
-      </div>
+        <div class="space-y-3">
+          <label class="block text-xs font-bold text-slate-300">最終生成的提示詞</label>
+          <textarea id="prompt-output" readonly rows="5" class="w-full bg-slate-950/90 text-slate-100 font-mono text-xs sm:text-sm p-4 rounded-2xl border border-slate-700/80 focus:outline-none shadow-inner select-all leading-relaxed"></textarea>
+          <button onclick="PromptGenerator.copyPromptText()" class="w-full py-3.5 px-6 rounded-2xl font-black text-base bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 shadow-lg flex items-center justify-center gap-2 transition-all">
+            <i class="fa-regular fa-copy" id="copy-icon"></i>
+            <span id="copy-btn-label">複製提示詞</span>
+          </button>
+        </div>
+      </section>
 
-      <!-- 最終生成的提示詞 (完全還原照片中介面) -->
-      <div class="space-y-3">
-        <label class="block text-xs font-bold text-slate-300">
-          最終生成的提示詞
-        </label>
-        
-        <textarea id="prompt-output" readonly rows="5" class="w-full bg-slate-950/90 text-slate-100 font-mono text-xs sm:text-sm p-4 rounded-2xl border border-slate-700/80 focus:outline-none shadow-inner select-all leading-relaxed no-scrollbar"></textarea>
+      <section class="panel p-5 sm:p-6">
+        <div class="pb-3 mb-3 border-b border-slate-700/60">
+          <h2 class="text-base font-bold text-slate-300">第二步 - 開啟聊天機器人</h2>
+        </div>
+        <a href="https://gemini.google.com" target="_blank" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-200 hover:from-white hover:to-slate-100 text-slate-900 font-black text-base flex items-center justify-center gap-2.5 shadow-md transition-all">
+          <span>🚀 開啟聊天機器人</span>
+        </a>
+        <p class="text-center text-xs text-slate-400 mt-3">開啟聊天機器人。然後把提示詞貼上聊天視窗，可使用 Gemini 或 ChatGPT。</p>
+        <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-center gap-3">
+          <button onclick="PromptGenerator.openSandboxModal()" class="text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5"><i class="fa-solid fa-play"></i> 測試 AI 輸出的遊戲代碼</button>
+          <button onclick="PromptGenerator.openGoogleSitesModal()" class="text-xs text-amber-400 hover:text-amber-300 bg-amber-950/40 border border-amber-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5"><i class="fa-solid fa-globe"></i> 嵌入到 Google Sites 步驟</button>
+        </div>
+      </section>
+    </div>
+  </section>
 
-        <!-- 複製提示詞大按鈕 (金黃色按鈕) -->
-        <button onclick="copyPromptText()" class="w-full py-3.5 px-6 rounded-2xl font-black text-base bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-98">
-          <i class="fa-regular fa-copy" id="copy-icon"></i>
-          <span id="copy-btn-label">複製提示詞</span>
-        </button>
-      </div>
-
-    </section>
-
-    <!-- 第二步：開啟聊天機器人 (Gemini / ChatGPT) -->
-    <section class="bg-cardbg/90 rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-700/70">
-      <div class="pb-3 mb-3 border-b border-slate-700/60">
-        <h2 class="text-base font-bold text-slate-300">第二步 - 開啟聊天機器人</h2>
-      </div>
-
-      <!-- 淺灰/白漸變開啟按鈕 (還原使用者照片樣式) -->
-      <a href="https://gemini.google.com" target="_blank" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-200 hover:from-white hover:to-slate-100 text-slate-900 font-black text-base flex items-center justify-center gap-2.5 shadow-md transition-all active:scale-98">
-        <span>🚀 開啟聊天機器人</span>
-      </a>
-
-      <p class="text-center text-xs text-slate-400 mt-3">
-        開啟聊天機器人。然後把提示詞貼上聊天視窗，可使用 Gemini 或 ChatGPT。 🚀
-      </p>
-
-      <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-center gap-3">
-        <button onclick="openSandboxModal()" class="text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
-          <i class="fa-solid fa-play"></i> 測試 AI 輸出的遊戲代碼
-        </button>
-        <button onclick="openGoogleSitesModal()" class="text-xs text-amber-400 hover:text-amber-300 bg-amber-950/40 border border-amber-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
-          <i class="fa-solid fa-globe"></i> 嵌入到 Google Sites 步驟
-        </button>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- 核心自訂彈出式選單容器 (直接解決 iPad/Safari/Chrome 無法點選問題) -->
-  <div id="popover-backdrop" onclick="closePopover()" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm hidden transition-opacity duration-200"></div>
-
+  <!-- Popovers / Modals（共用） -->
+  <div id="popover-backdrop" onclick="PromptGenerator.closePopover()" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm hidden"></div>
   <div id="ios-popover-box" class="fixed z-50 ios-popover hidden w-72 sm:w-80 max-h-[75vh] flex flex-col overflow-hidden transform transition-all duration-150 scale-95 opacity-0">
     <div class="p-3 pb-2 bg-white/40 border-b border-slate-300/60 flex items-center justify-between">
       <span id="popover-title" class="text-xs font-black text-slate-800 tracking-wider uppercase">請選擇項目</span>
-      <button onclick="closePopover()" class="text-slate-600 hover:text-slate-900 w-6 h-6 flex items-center justify-center text-sm rounded-full bg-slate-200/60">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <button onclick="PromptGenerator.closePopover()" class="text-slate-600 hover:text-slate-900 w-6 h-6 flex items-center justify-center text-sm rounded-full bg-slate-200/60"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div id="popover-options-list" class="overflow-y-auto divide-y divide-slate-300/40 flex-1">
-      <!-- JS 動態生成選項，還原帶有打勾 ✓ 的清單 -->
-    </div>
+    <div id="popover-options-list" class="overflow-y-auto divide-y divide-slate-300/40 flex-1"></div>
   </div>
 
-  <!-- 沙盒測試彈窗 -->
   <div id="sandbox-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-6">
     <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[88vh] flex flex-col overflow-hidden shadow-2xl">
       <div class="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
@@ -329,22 +356,17 @@
           <h3 class="font-bold text-white text-base">遊戲即時測試沙盒</h3>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="runSandboxCode()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all">
-            <i class="fa-solid fa-play"></i> 執行預覽
-          </button>
-          <button onclick="closeSandboxModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
+          <button onclick="PromptGenerator.runSandboxCode()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-play"></i> 執行預覽</button>
+          <button onclick="PromptGenerator.closeSandboxModal()" class="text-slate-400 hover:text-white p-1 rounded-lg"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
       </div>
-
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 p-3 overflow-hidden bg-slate-950">
         <div class="flex flex-col h-full bg-slate-900 rounded-2xl p-3 border border-slate-800">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-bold text-slate-300">把 Gemini 回傳的完整 HTML 貼在此處：</span>
-            <button onclick="loadDemoGame()" class="text-xs text-amber-400 underline">載入防亂碼接魚示範</button>
+            <button onclick="PromptGenerator.loadDemoGame()" class="text-xs text-amber-400 underline">載入防亂碼接魚示範</button>
           </div>
-          <textarea id="sandbox-code" placeholder="請在此處貼上完整 HTML 代碼..." class="flex-1 w-full bg-slate-950 text-slate-200 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:border-amber-400 outline-none resize-none no-scrollbar"></textarea>
+          <textarea id="sandbox-code" placeholder="請在此處貼上完整 HTML 代碼..." class="flex-1 w-full bg-slate-950 text-slate-200 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:border-amber-400 outline-none resize-none"></textarea>
         </div>
         <div class="flex flex-col h-full bg-slate-900 rounded-2xl p-3 border border-slate-800">
           <span class="text-xs font-bold text-slate-300 mb-2">平板預覽：</span>
@@ -354,561 +376,46 @@
     </div>
   </div>
 
-  <!-- Google Sites 說明彈窗 -->
   <div id="gsites-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-xl p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h3 class="font-bold text-white text-base flex items-center gap-2">
-          <i class="fa-brands fa-google text-amber-400"></i> 如何嵌入 Google Sites (Google 協作平台)
-        </h3>
-        <button onclick="closeGoogleSitesModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h3 class="font-bold text-white text-base flex items-center gap-2"><i class="fa-brands fa-google text-amber-400"></i> 如何嵌入 Google Sites</h3>
+        <button onclick="PromptGenerator.closeGoogleSitesModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
         <p>1. 在 Gemini 中將生成的單一 HTML 代碼全部複製。</p>
-        <p>2. 打開學校或班級的 Google Sites 編輯器，在右側點選 <b>「插入 (Insert)」</b> ➔ 點選 <b>「嵌入 (&lt;/&gt; Embed)」</b>。</p>
-        <p>3. 點選 <b>「嵌入程式碼 (Embed Code)」</b> 分頁，把代碼直接貼上並儲存！</p>
-        <p class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-amber-300">
-          💡 建議：把 Google Sites 嵌入卡片的寬度拉到全寬，高度設定為 <b>650px ~ 720px</b>，在 iPad 觸控螢幕上遊玩效果最佳！
-        </p>
+        <p>2. 打開 Google Sites 編輯器，右側「插入」➔「嵌入」。</p>
+        <p>3. 「嵌入程式碼」分頁貼上並儲存。</p>
+        <p class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-amber-300">建議嵌入高度 <b>650px ~ 720px</b>，iPad 效果最佳。</p>
       </div>
       <div class="flex justify-end pt-2">
-        <button onclick="closeGoogleSitesModal()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold py-2 px-5 rounded-xl">完成</button>
+        <button onclick="PromptGenerator.closeGoogleSitesModal()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold py-2 px-5 rounded-xl">完成</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast 訊息通知 -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-amber-400 text-slate-950 font-black py-3 px-5 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs sm:text-sm">
     <i class="fa-solid fa-circle-check text-base"></i>
     <span id="toast-msg">提示詞已成功複製到剪貼簿！</span>
   </div>
 
   <script>
-    // 香港及常用小學數學課程數據（精確對應照片中的「如何比較分數」、「不同分數類型」等）
-    const curriculumData = {
-      p4: {
-        name: "小學四年級 (P4)",
-        topics: [
-          {
-            title: "如何比較分數",
-            goals: [
-              "比較分數與基準值（例如 1/2 或 1）",
-              "比較同分母分數的大小",
-              "比較同分子分數的大小",
-              "認識真分數、假分數與帶分數的互換"
-            ]
-          },
-          {
-            title: "不同分數類型",
-            goals: [
-              "分辨真分數、假分數與帶分數",
-              "假分數化為帶分數運算",
-              "帶分數化為假分數運算"
-            ]
-          },
-          {
-            title: "同分母分數加減法",
-            goals: [
-              "同分母分數加法與約簡",
-              "同分母分數減法與退位處理",
-              "帶分數的同分母加減混合計算"
-            ]
-          },
-          {
-            title: "小數的認識與比較",
-            goals: [
-              "認識十分位、百分位與千分位",
-              "比較一位及兩位小數大小",
-              "分數與小數的互相轉換 (如 1/4 = 0.25)"
-            ]
-          },
-          {
-            title: "周界與面積計算",
-            goals: [
-              "正方形與長方形的周界計算",
-              "正方形與長方形的面積計算",
-              "周界與面積概念分辨與複合圖形"
-            ]
-          }
-        ]
-      },
-      p5: {
-        name: "小學五年級 (P5)",
-        topics: [
-          {
-            title: "異分母分數加減法",
-            goals: [
-              "利用通分（公分母）計算分數加法",
-              "利用通分計算分數減法及退位",
-              "異分母分數加減混合計算應用題"
-            ]
-          },
-          {
-            title: "小數乘法運算",
-            goals: [
-              "小數乘以整數的算理與小數點定位",
-              "小數乘以小數的積與位數規律",
-              "小數乘法生活購物應用題"
-            ]
-          },
-          {
-            title: "簡易方程與代數",
-            goals: [
-              "以字母符號列出代數式 (例如 x + 8)",
-              "解一步計算的簡易方程 (涉及加減)",
-              "解一步計算的簡易方程 (涉及乘除)",
-              "利用簡易方程解答實際問題"
-            ]
-          },
-          {
-            title: "多邊形面積與立體體積",
-            goals: [
-              "三角形面積計算 (底 × 高 ÷ 2)",
-              "平行四邊形與梯形面積計算",
-              "長方體與正方體的體積計算"
-            ]
-          },
-          {
-            title: "百分數的初步認識",
-            goals: [
-              "認識百分數符號 (%) 意義",
-              "百分數、分數與小數三者互換",
-              "計算一個數佔另一個數的百分之幾"
-            ]
-          }
-        ]
-      },
-      p6: {
-        name: "小學六年級 (P6)",
-        topics: [
-          {
-            title: "分數除法與四則混合運算",
-            goals: [
-              "分數除以整數與「乘以倒數」的算理",
-              "整數除以分數與分數除以分數",
-              "分數四則混合計算與括號先後"
-            ]
-          },
-          {
-            title: "小數除法與循環小數",
-            goals: [
-              "小數除以整數與小數點對齊",
-              "小數除以小數之擴分轉化技巧",
-              "求商至指定小數位（四捨五入）"
-            ]
-          },
-          {
-            title: "百分數的進階應用",
-            goals: [
-              "求折扣（幾折）、折讓金額與售價",
-              "計算成本、利潤、賺蝕率與虧損",
-              "求增加百分率與減少百分率"
-            ]
-          },
-          {
-            title: "圓周與圓面積計算",
-            goals: [
-              "圓周公式 C = 2πr 或 πd 的計算",
-              "圓面積公式 A = πr² 的計算",
-              "半圓及複合陰影圖形周界與面積"
-            ]
-          },
-          {
-            title: "速率與行程問題",
-            goals: [
-              "速率單位 (m/s 及 km/h) 概念與換算",
-              "速率、時間與距離三者公式互換",
-              "相向而行與同向追及問題"
-            ]
-          }
-        ]
-      }
-    };
-
-    // 選單選項清單
-    const optionsData = {
-      device: [
-        "平板電腦 📱",
-        "電腦/筆電 💻",
-        "電子白板 🖥️",
-        "智能手機 📱"
-      ],
-      gameType: [
-        "接球 🧺",
-        "爆破 🎈",
-        "分類 📦",
-        "跑酷 🏃",
-        "射擊 🎯",
-        "迷宮 🧀"
-      ],
-      mode: [
-        "單人練習 👤",
-        "二人對戰 ⚔️",
-        "雙人合作 🤝",
-        "限時衝刺 ⏱️"
-      ],
-      character: [
-        "魚 🐟",
-        "小貓 🐱",
-        "蛋糕 🎂",
-        "珍珠奶茶 🧋",
-        "太空人 👨‍🚀",
-        "恐龍 🦖",
-        "魔法師 🧙",
-        "獨角獸 🦄",
-        "自拍照片做主角 📸"
-      ]
-    };
-
-    // 當前全域狀態
-    let state = {
-      grade: 'p4',
-      device: '平板電腦 📱',
-      gameType: '接球 🧺',
-      mode: '單人練習 👤',
-      topic: '如何比較分數',
-      goal: '比較分數與基準值（例如 1/2 或 1）',
-      character: '魚 🐟',
-      avatarBase64: null,
-      exerciseBase64: null
-    };
-
-    let activeField = null;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      setGrade('p4');
-    });
-
-    // 年級切換
-    function setGrade(gradeKey) {
-      state.grade = gradeKey;
-      
-      // 更新按鈕樣式
-      ['p4', 'p5', 'p6'].forEach(g => {
-        const btn = document.getElementById(`btn-grade-${g}`);
-        if (g === gradeKey) {
-          btn.className = "py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-amber-400 text-slate-950 shadow-md";
-        } else {
-          btn.className = "py-2.5 sm:py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white";
-        }
+    function switchTeacherTab(id) {
+      document.querySelectorAll('.teacher-tab').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id)?.classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === id);
       });
-
-      // 重設課題與目標為該年級的第一個課題
-      const firstTopic = curriculumData[gradeKey].topics[0];
-      state.topic = firstTopic.title;
-      state.goal = firstTopic.goals[0];
-
-      document.getElementById('label-topic').textContent = state.topic;
-      document.getElementById('label-goal').textContent = state.goal;
-
-      updatePrompt();
-    }
-
-    // 開啟模擬 iPad 的打勾選單彈窗
-    function openPopover(field, triggerEl) {
-      activeField = field;
-      const popoverBox = document.getElementById('ios-popover-box');
-      const backdrop = document.getElementById('popover-backdrop');
-      const optionsList = document.getElementById('popover-options-list');
-      const popoverTitle = document.getElementById('popover-title');
-
-      let list = [];
-      let currentValue = state[field];
-      let titleText = "請選擇項目";
-
-      if (field === 'device') {
-        titleText = "選擇遊玩裝置";
-        list = optionsData.device;
-      } else if (field === 'gameType') {
-        titleText = "選擇遊戲方式";
-        list = optionsData.gameType;
-      } else if (field === 'mode') {
-        titleText = "選擇遊玩模式";
-        list = optionsData.mode;
-      } else if (field === 'character') {
-        titleText = "選擇遊戲角色";
-        list = optionsData.character;
-      } else if (field === 'topic') {
-        titleText = "選擇教學課題";
-        list = curriculumData[state.grade].topics.map(t => t.title);
-      } else if (field === 'goal') {
-        titleText = "選擇學習目標細項";
-        const curTopicData = curriculumData[state.grade].topics.find(t => t.title === state.topic) || curriculumData[state.grade].topics[0];
-        list = curTopicData.goals;
-      }
-
-      popoverTitle.textContent = titleText;
-      optionsList.innerHTML = '';
-
-      // 產生帶打勾 ✓ 的清單項 (完全重現照片效果)
-      list.forEach(item => {
-        const row = document.createElement('div');
-        const isSelected = (item === currentValue);
-        row.className = `ios-option ${isSelected ? 'selected bg-white/70' : ''}`;
-        
-        row.innerHTML = `
-          <div class="w-5 text-center text-slate-800 font-black">${isSelected ? '✓' : ''}</div>
-          <div class="flex-1">${item}</div>
-        `;
-
-        row.onclick = (e) => {
-          e.stopPropagation();
-          selectOption(field, item);
-        };
-
-        optionsList.appendChild(row);
-      });
-
-      // 計算位置：在平板/手機上置中浮現或靠齊
-      backdrop.classList.remove('hidden');
-      popoverBox.classList.remove('hidden');
-
-      // 定位彈窗至視窗中央稍微偏上，對觸控最友善
-      popoverBox.style.top = '50%';
-      popoverBox.style.left = '50%';
-      popoverBox.style.transform = 'translate(-50%, -50%) scale(1)';
-
-      setTimeout(() => {
-        popoverBox.classList.remove('opacity-0', 'scale-95');
-        popoverBox.classList.add('opacity-100', 'scale-100');
-      }, 10);
-    }
-
-    // 關閉彈窗
-    function closePopover() {
-      const popoverBox = document.getElementById('ios-popover-box');
-      const backdrop = document.getElementById('popover-backdrop');
-      
-      popoverBox.classList.add('opacity-0', 'scale-95');
-      popoverBox.classList.remove('opacity-100', 'scale-100');
-
-      setTimeout(() => {
-        popoverBox.classList.add('hidden');
-        backdrop.classList.add('hidden');
-        activeField = null;
-      }, 150);
-    }
-
-    // 選取某個選項
-    function selectOption(field, value) {
-      state[field] = value;
-      document.getElementById(`label-${field}`).textContent = value;
-
-      // 若改了課題，目標需自動切到該課題的第一個目標
-      if (field === 'topic') {
-        const curTopicData = curriculumData[state.grade].topics.find(t => t.title === value);
-        if (curTopicData && curTopicData.goals.length > 0) {
-          state.goal = curTopicData.goals[0];
-          document.getElementById('label-goal').textContent = state.goal;
-        }
-      }
-
-      // 若選了自拍相片做主角，展開上傳框
-      const avatarDrawer = document.getElementById('avatar-drawer');
-      if (field === 'character') {
-        if (value.includes('自拍') || value.includes('相片')) {
-          avatarDrawer.classList.remove('hidden');
-        } else {
-          avatarDrawer.classList.add('hidden');
-        }
-      }
-
-      closePopover();
-      updatePrompt();
-    }
-
-    // 學生頭像上傳
-    function handleAvatarFile(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          state.avatarBase64 = e.target.result;
-          const img = document.getElementById('avatar-preview-img');
-          const placeholder = document.getElementById('avatar-placeholder-icon');
-          img.src = state.avatarBase64;
-          img.classList.remove('hidden');
-          placeholder.classList.add('hidden');
-          showToast('📸 學生頭像已載入！已寫入提示詞。');
-          updatePrompt();
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    // 難點題目錯題照片上傳
-    function handleExerciseFile(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          state.exerciseBase64 = e.target.result;
-          const badge = document.getElementById('badge-exercise-status');
-          badge.classList.remove('hidden');
-          showToast('📑 錯題照片已載入！已加入「AI 結構模仿出題」指令。');
-          updatePrompt();
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    // 即時動態生成高規格 AI 提示詞
-    function updatePrompt() {
-      const gradeName = curriculumData[state.grade].name;
-      
-      let prompt = `在 ${state.device}，編寫程式碼製作 ${state.gameType} ${state.mode}遊戲幫助學生學習 ${state.topic} 的「${state.goal}」。請讓遊戲元素看起來像 ${state.character}。
-
-【重要遊戲與出題規格規範】：
-1. 【防亂碼垂直分數排版】：
-   - 分數表達絕對不能出現未排版的斜線或亂碼！
-   - 所有分數必須使用乾淨標準的 HTML/CSS 垂直分數排版（例如：<span class="math-frac"><span class="math-num">分子</span><span class="math-den">分母</span></span>）或在 Canvas 中精確繪製水平分數線，保證在平板螢幕上清晰美觀。
-2. 【純演算法隨機動態出題（無限題庫）】：
-   - 絕對禁止使用死板固定的題目清單！
-   - 必須編寫純 JavaScript 題目生成函數（如 generateQuestion()），每輪自動隨機產生合理的分子與分母數字，保證每一次遊玩都是全新題目，題庫無限！
-3. 【多元化題目型態】：
-   - 題目需融合直式數字分數、帶分數、圓形比例圖 (Canvas/SVG繪製) 與數線等多種幾何視覺表達形式。
-${state.exerciseBase64 ? `4. 【學生自學難點模仿出題】：
-   - 參考學生上載的自學難點題目照片：請 AI 深度分析該難點題目的數學結構、運算瓶頸與常見易錯點，並在遊戲中「模仿該題型結構，但隨機改變數字」，進行針對性的變式出題與誘答設計！\n` : ''}${state.avatarBase64 ? `5. 【自拍主角】：遊戲開頭提供學生自拍/上傳相片介面，將相片裁切為圓形作為遊戲操控角色。\n` : ''}6. 【輸出規範】：請直接輸出一個完整、可獨立執行的單一 HTML5 檔案（內含所有 HTML、CSS 與 JS，無外部依賴，可直接在瀏覽器打開或嵌入 Google Sites）。`;
-
-      document.getElementById('prompt-output').value = prompt;
-    }
-
-    // 複製提示詞
-    function copyPromptText() {
-      const textarea = document.getElementById('prompt-output');
-      textarea.select();
-      textarea.setSelectionRange(0, 99999);
-
-      let ok = false;
-      try {
-        ok = document.execCommand('copy');
-      } catch (e) {
-        ok = false;
-      }
-
-      if (!ok && navigator.clipboard) {
-        navigator.clipboard.writeText(textarea.value).then(() => {
-          showCopySuccess();
-        });
-      } else {
-        showCopySuccess();
-      }
-    }
-
-    function showCopySuccess() {
-      const label = document.getElementById('copy-btn-label');
-      const icon = document.getElementById('copy-icon');
-      label.textContent = "已成功複製！";
-      icon.className = "fa-solid fa-check";
-      showToast("✨ 提示詞已複製！可貼到 Gemini 生成遊戲。");
-      setTimeout(() => {
-        label.textContent = "複製提示詞";
-        icon.className = "fa-regular fa-copy";
-      }, 2500);
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      document.getElementById('toast-msg').textContent = msg;
-      t.classList.remove('translate-y-20', 'opacity-0');
-      t.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
-        t.classList.remove('translate-y-0', 'opacity-100');
-        t.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
-
-    // 沙盒執行
-    function openSandboxModal() {
-      document.getElementById('sandbox-modal').classList.remove('hidden');
-    }
-    function closeSandboxModal() {
-      document.getElementById('sandbox-modal').classList.add('hidden');
-    }
-
-    function runSandboxCode() {
-      const code = document.getElementById('sandbox-code').value;
-      const iframe = document.getElementById('sandbox-frame');
-      if (!code.trim()) {
-        showToast("⚠️ 請先貼上 HTML 程式碼！");
-        return;
-      }
-      const blob = new Blob([code], { type: 'text/html' });
-      iframe.src = URL.createObjectURL(blob);
-      showToast("🚀 遊戲已成功載入並運行！");
-    }
-
-    function loadDemoGame() {
-      const demo = `<!DOCTYPE html>
-<html lang="zh-HK">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>隨機防亂碼接魚示範</title>
-<script src="https://cdn.tailwindcss.com"><\/script>
-<style>
-body { margin: 0; background: #0e1e38; color: white; text-align: center; overflow: hidden; touch-action: none; font-family: sans-serif; }
-.math-frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-weight: bold; line-height: 1; }
-.math-num { border-bottom: 2px solid white; padding-bottom: 1px; }
-.math-den { padding-top: 1px; }
-</style>
-</head>
-<body class="flex flex-col items-center justify-between h-screen p-2">
-<div class="w-full max-w-md bg-slate-900/90 rounded-2xl p-2.5 flex justify-between items-center text-xs">
-  <div>接住大於 <span class="math-frac text-amber-300"><span class="math-num">1</span><span class="math-den">2</span></span> 的分數魚 🐟</div>
-  <div class="bg-amber-400 text-slate-900 px-3 py-1 rounded-xl font-bold">得分：<span id="sc">0</span></div>
-</div>
-<canvas id="cv" class="w-full max-w-md flex-1 rounded-2xl my-2 bg-slate-950 border border-slate-800"></canvas>
-<div class="text-[11px] text-slate-400 pb-1">左右滑動接住正確的魚！</div>
-<script>
-const cv = document.getElementById('cv'); const ctx = cv.getContext('2d');
-let w, h, score = 0, bx = 120, items = [];
-function rs(){ w = cv.width = cv.clientWidth; h = cv.height = cv.clientHeight; }
-window.onresize = rs; setTimeout(rs, 50);
-function spawn(){
-  if(!w) return;
-  const den = Math.floor(Math.random()*6)+3;
-  const num = Math.floor(Math.random()*(den-1))+1;
-  items.push({ x: Math.random()*(w-60)+30, y: -20, num, den, val: num/den, speed: 2+Math.random()*2 });
-}
-setInterval(spawn, 1200);
-function move(x){ const r = cv.getBoundingClientRect(); bx = Math.max(30, Math.min(w-30, x-r.left)); }
-window.onmousemove = e => move(e.clientX);
-window.ontouchmove = e => { if(e.touches[0]) move(e.touches[0].clientX); };
-function loop(){
-  if(w&&h){
-    ctx.clearRect(0,0,w,h);
-    ctx.font="30px sans-serif"; ctx.textAlign="center"; ctx.fillText("🐱🧺", bx, h-25);
-    for(let i=items.length-1; i>=0; i--){
-      const it = items[i]; it.y += it.speed;
-      ctx.font="20px sans-serif"; ctx.fillText("🐟", it.x, it.y);
-      ctx.fillStyle="#fff"; ctx.font="bold 12px sans-serif";
-      ctx.fillText(it.num, it.x, it.y-18);
-      ctx.fillRect(it.x-8, it.y-16, 16, 2);
-      ctx.fillText(it.den, it.x, it.y-6);
-      if(it.y > h-50 && Math.abs(it.x-bx)<40){
-        if(it.val > 0.5){ score += 10; } else { score = Math.max(0, score-5); }
-        document.getElementById('sc').innerText = score;
-        items.splice(i, 1); continue;
-      }
-      if(it.y > h+20) items.splice(i, 1);
-    }
-  }
-  requestAnimationFrame(loop);
-}
-loop();
-<\/script>
-</body>
-</html>`;
-      document.getElementById('sandbox-code').value = demo;
-      runSandboxCode();
-    }
-
-    function openGoogleSitesModal() {
-      document.getElementById('gsites-modal').classList.remove('hidden');
-    }
-    function closeGoogleSitesModal() {
-      document.getElementById('gsites-modal').classList.add('hidden');
+      if (id === 'tab-practice') App.renderPracticeBankTeacher();
+      if (id === 'tab-class') App.refreshClassOverview();
+      if (id === 'tab-generator') PromptGenerator.updatePrompt();
     }
   </script>
+  <script src="js/curriculum.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/recommend.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
