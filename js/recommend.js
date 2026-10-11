@@ -57,7 +57,6 @@ window.Recommend = (() => {
           }
         }
       } else if (r.week) {
-        // 無日期時：靠週次與已練覆蓋推估
         const covered = topic.goals.filter(g => stats[g.id] && stats[g.id].attempts > 0).length;
         if (covered === 0) overdueScore += 10;
       }
@@ -87,10 +86,10 @@ window.Recommend = (() => {
     };
   }
 
-  function suggestForStudent(student, limit = 3) {
+  async function suggestForStudent(student, limit = 3) {
     const grade = Curriculum.getGrade(student.gradeId);
     if (!grade) return [];
-    const schedule = GameDB.getSchedule(student.gradeId);
+    const schedule = await GameDB.getSchedule(student.gradeId);
     const rows = schedule ? schedule.rows : [];
     return grade.topics
       .map(t => scoreTopic(student, t, rows))
@@ -98,7 +97,6 @@ window.Recommend = (() => {
       .slice(0, limit);
   }
 
-  /** 從建議課題中挑優先目標：錯最多／未練優先 */
   function pickGoal(suggestion) {
     const ranked = [...suggestion.goals].sort((a, b) => {
       const aw = (a.streakWrong || 0) * 10 + (a.accuracy === null ? 5 : (1 - a.accuracy) * 8);

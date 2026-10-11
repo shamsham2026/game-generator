@@ -43,6 +43,7 @@
       <p class="text-slate-400 text-sm mt-3 max-w-lg mx-auto">
         課本課題鎖定不變；教師可上載進度表、按範疇加練習；學生以班別學號進入，題目每次隨機。
       </p>
+      <p id="conn-badge" class="conn-badge conn-local mt-4 inline-flex">檢查連線中…</p>
     </header>
 
     <div class="grid sm:grid-cols-2 gap-4">
@@ -166,6 +167,7 @@
     <div class="flex flex-wrap gap-2 panel p-2">
       <button type="button" class="tab-btn active" data-tab="tab-schedule" onclick="switchTeacherTab('tab-schedule')">進度表</button>
       <button type="button" class="tab-btn" data-tab="tab-practice" onclick="switchTeacherTab('tab-practice')">範疇練習</button>
+      <button type="button" class="tab-btn" data-tab="tab-class" onclick="switchTeacherTab('tab-class')">班別總覽</button>
       <button type="button" class="tab-btn" data-tab="tab-curriculum" onclick="switchTeacherTab('tab-curriculum')">鎖定課題</button>
       <button type="button" class="tab-btn" data-tab="tab-generator" onclick="switchTeacherTab('tab-generator')">遊戲提示詞</button>
     </div>
@@ -206,6 +208,17 @@
       </form>
       <h4 class="font-bold text-slate-300 text-sm mt-6 mb-2">本年級練習庫</h4>
       <ul id="teacher-bank-list"></ul>
+    </div>
+
+    <!-- 班別總覽（連線後可見全班） -->
+    <div id="tab-class" class="teacher-tab panel p-5 sm:p-6 hidden">
+      <h3 class="font-bold text-slate-200 mb-2">班別練習總覽</h3>
+      <p class="text-xs text-slate-400 mb-4">連線模式下可即時查看全班登入與平均分；離線模式只顯示本機瀏覽器資料。</p>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <input id="class-overview-code" class="field max-w-[10rem]" placeholder="班別 例：4A" value="4A">
+        <button type="button" onclick="App.refreshClassOverview()" class="custom-pill">重新整理</button>
+      </div>
+      <div id="class-overview-result" class="text-slate-300"></div>
     </div>
 
     <!-- 鎖定課題一覽 -->
@@ -381,6 +394,7 @@
         btn.classList.toggle('active', btn.dataset.tab === id);
       });
       if (id === 'tab-practice') App.renderPracticeBankTeacher();
+      if (id === 'tab-class') App.refreshClassOverview();
       if (id === 'tab-generator') PromptGenerator.updatePrompt();
     }
   </script>

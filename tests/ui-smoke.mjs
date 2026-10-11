@@ -18,7 +18,9 @@ page.on('console', msg => {
   if (msg.type() === 'error') logs.push('CONSOLE ' + msg.text());
 });
 
-await page.goto('http://127.0.0.1:8765/', { waitUntil: 'networkidle0' });
+await page.goto(process.env.BASE_URL || 'http://127.0.0.1:8787/', { waitUntil: 'networkidle0' });
+await page.waitForFunction(() => document.getElementById('conn-badge')?.textContent.includes('連線') || document.getElementById('conn-badge')?.textContent.includes('離線'));
+const connText = await page.$eval('#conn-badge', el => el.textContent);
 await page.screenshot({ path: `${OUT}/01-home.png`, fullPage: true });
 
 // open student login
@@ -91,11 +93,12 @@ await page.screenshot({ path: `${OUT}/07-prompt-generator.png`, fullPage: true }
 
 const promptOk = prompt.includes('接球') && prompt.includes('如何比較分數');
 const invalidRejected = /找不到|失敗|略過|假課題/.test(invalidText);
-const result = { badge, suggestCount, invalidRejected, bankCount1, bankCount2, promptOk, logs };
+const cloudConnected = /已連線/.test(connText);
+const result = { connText, cloudConnected, badge, suggestCount, invalidRejected, bankCount1, bankCount2, promptOk, logs };
 console.log(JSON.stringify(result, null, 2));
 
 await browser.close();
 
-if (!badge.includes('4A') || suggestCount < 1 || bankCount1 < 1 || bankCount2 !== bankCount1 || !promptOk) {
+if (!cloudConnected || !badge.includes('4A') || suggestCount < 1 || bankCount1 < 1 || bankCount2 !== bankCount1 || !promptOk) {
   process.exit(1);
 }
