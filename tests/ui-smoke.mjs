@@ -74,15 +74,20 @@ await new Promise(r => setTimeout(r, 400));
 const invalidText = await page.$eval('#schedule-result', el => el.innerText);
 
 await page.evaluate(() => switchTeacherTab('tab-practice'));
-await page.type('#prac-title', '基準值接球測試');
+const uniqueTitle = `UI練習-${Date.now()}`;
+await page.$eval('#prac-title', el => { el.value = ''; });
+await page.$eval('#prac-hint', el => { el.value = ''; });
+await page.type('#prac-title', uniqueTitle);
 await page.type('#prac-hint', '大於二分之一');
 await page.click('#tab-practice button[type="submit"]');
-await new Promise(r => setTimeout(r, 500));
+await new Promise(r => setTimeout(r, 700));
 const bankCount1 = await page.$$eval('#teacher-bank-list li', els => els.length);
-await page.type('#prac-title', '基準值接球測試');
+await page.$eval('#prac-title', el => { el.value = ''; });
+await page.$eval('#prac-hint', el => { el.value = ''; });
+await page.type('#prac-title', uniqueTitle);
 await page.type('#prac-hint', '大於二分之一');
 await page.click('#tab-practice button[type="submit"]');
-await new Promise(r => setTimeout(r, 500));
+await new Promise(r => setTimeout(r, 700));
 const bankCount2 = await page.$$eval('#teacher-bank-list li', els => els.length);
 await page.screenshot({ path: `${OUT}/06-practice-bank.png`, fullPage: true });
 
