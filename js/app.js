@@ -238,9 +238,15 @@ window.App = (() => {
     if (q.choices && q.choices.length) {
       inputWrap.classList.add('hidden');
       choices.classList.remove('hidden');
-      choices.innerHTML = q.choices.map(c =>
-        `<button type="button" class="choice-btn" onclick="App.submitAnswer(${JSON.stringify(String(c))})">${c}</button>`
-      ).join('');
+      choices.innerHTML = '';
+      q.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice-btn';
+        btn.textContent = String(c);
+        btn.addEventListener('click', () => App.submitAnswer(String(c)));
+        choices.appendChild(btn);
+      });
     } else {
       choices.classList.add('hidden');
       inputWrap.classList.remove('hidden');
@@ -264,9 +270,20 @@ window.App = (() => {
 
     const fb = document.getElementById('practice-feedback');
     fb.className = `text-sm min-h-[1.25rem] font-bold ${ok ? 'text-emerald-300' : 'text-rose-300'}`;
-    fb.innerHTML = ok
-      ? '✓ 正確！'
-      : `✗ 再想想。正確答案：<span class="text-white">${item.question.answer}</span>${item.question.explain ? `<span class="block text-xs font-normal text-slate-400 mt-1">${item.question.explain}</span>` : ''}`;
+    fb.textContent = '';
+    if (ok) {
+      fb.textContent = '✓ 正確！';
+    } else {
+      const line = document.createElement('span');
+      line.textContent = `✗ 再想想。正確答案：${item.question.answer}`;
+      fb.appendChild(line);
+      if (item.question.explain) {
+        const ex = document.createElement('span');
+        ex.className = 'block text-xs font-normal text-slate-400 mt-1';
+        ex.textContent = item.question.explain;
+        fb.appendChild(ex);
+      }
+    }
 
     setTimeout(() => {
       practiceIndex += 1;
