@@ -485,12 +485,18 @@ window.App = (() => {
     }
   }
 
-  async function openTeacher() {
+  async function openTeacher(tabId = 'tab-schedule') {
     updateConnBadge();
     await renderPracticeBankTeacher();
     await renderCurriculumLockPanel();
     showView('teacher');
-    PromptGenerator.updatePrompt();
+    if (typeof switchTeacherTab === 'function') switchTeacherTab(tabId);
+    else PromptGenerator.updatePrompt();
+  }
+
+  /** 首頁直達：完整保留原提示詞產生器 */
+  async function openPromptGenerator() {
+    await openTeacher('tab-generator');
   }
 
   async function exportData() {
@@ -515,6 +521,7 @@ window.App = (() => {
     uploadSchedule,
     addPracticeFromForm,
     openTeacher,
+    openPromptGenerator,
     exportData,
     onPracGradeChange,
     renderPracticeBankTeacher,
